@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Currently inside{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Currently inside ({{ inside|length }})</h1>
+  <form method="get"><input name="q" value="{{ request.GET.q }}" placeholder="Search name or host…"
+    class="border rounded-lg px-3 py-2 text-sm"></form>
+</div>
+<div class="bg-white rounded-xl shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-left text-slate-500">
+      <tr><th class="p-3">Visitor</th><th class="p-3">Host</th><th class="p-3">Expected out</th><th class="p-3">Status</th><th class="p-3"></th></tr>
+    </thead>
+    <tbody>
+      {% for v in inside %}
+      <tr class="border-t {% if v.is_overdue %}bg-rose-50{% endif %}">
+        <td class="p-3 font-medium">{{ v.display_name }}</td>
+        <td class="p-3">{{ v.host.get_full_name|default:v.host.username }}</td>
+        <td class="p-3">{{ v.expected_end|date:"d M H:i" }}</td>
+        <td class="p-3">{% if v.is_overdue %}<span class="text-rose-600 font-semibold">⚠ Overdue</span>{% else %}Inside{% endif %}</td>
+        <td class="p-3">
+          <form method="post" action="{% url 'visits:pass_action' v.access_pass.pk 'out' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'visits:occupancy' %}">
+            <button class="text-sky-700 underline">Check out</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="5" class="p-6 text-center text-slate-400">No visitors inside.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

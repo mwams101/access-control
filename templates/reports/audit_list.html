@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Audit log{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Audit log</h1>
+  <a href="{% url 'reports:audit_export' %}" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold">Export CSV</a>
+</div>
+<div class="bg-white rounded-xl shadow overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-left text-slate-500">
+      <tr><th class="p-3">Timestamp</th><th class="p-3">Actor</th><th class="p-3">Action</th><th class="p-3">Target</th></tr>
+    </thead>
+    <tbody>
+      {% for e in entries %}
+      <tr class="border-t">
+        <td class="p-3 whitespace-nowrap">{{ e.timestamp|date:"d M Y H:i:s" }}</td>
+        <td class="p-3">{{ e.actor|default:"system" }}</td>
+        <td class="p-3 font-mono text-xs">{{ e.action }}</td>
+        <td class="p-3 text-slate-500">{{ e.target_type }}#{{ e.target_id }}</td>
+      </tr>
+      {% empty %}<tr><td colspan="4" class="p-6 text-center text-slate-400">No audit entries yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

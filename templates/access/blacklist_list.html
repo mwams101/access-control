@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Blacklist{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Blacklist</h1>
+  <a href="{% url 'access:blacklist_create' %}" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold">+ Add entry</a>
+</div>
+<div class="bg-white rounded-xl shadow overflow-hidden">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-left text-slate-500">
+      <tr><th class="p-3">Name</th><th class="p-3">ID number</th><th class="p-3">Reason</th><th class="p-3">Active</th><th class="p-3"></th></tr>
+    </thead>
+    <tbody>
+      {% for e in entries %}
+      <tr class="border-t">
+        <td class="p-3">{{ e.full_name|default:"—" }}</td>
+        <td class="p-3 font-mono">{{ e.id_number|default:"—" }}</td>
+        <td class="p-3 text-slate-500">{{ e.reason|truncatechars:60 }}</td>
+        <td class="p-3">{% if e.active %}✅{% else %}—{% endif %}</td>
+        <td class="p-3"><a href="{% url 'access:blacklist_edit' e.pk %}" class="text-sky-700 underline">Edit</a></td>
+      </tr>
+      {% empty %}<tr><td colspan="5" class="p-6 text-center text-slate-400">Blacklist is empty.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}New visit request{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white rounded-xl shadow p-6">
+  <h1 class="text-xl font-bold mb-1">Request a visit</h1>
+  <p class="text-sm text-slate-500 mb-4">You'll receive an email once your request is reviewed.</p>
+  <form method="post" class="space-y-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <fieldset class="border rounded-lg p-3">
+      <legend class="text-sm font-semibold px-1">Additional people (entity/group visits)</legend>
+      {{ party_formset.management_form }}
+      {% for pf in party_formset %}{{ pf.as_p }}{% endfor %}
+    </fieldset>
+    <button class="bg-slate-900 text-white px-4 py-2 rounded-lg font-semibold">Submit request</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Zones{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">Building zones</h1>
+  <a href="{% url 'access:zone_create' %}" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold">+ New zone</a>
+</div>
+<div class="bg-white rounded-xl shadow divide-y">
+  {% for z in zones %}
+  <div class="p-4 flex items-center justify-between">
+    <div>
+      <p class="font-semibold">{{ z.name }} {% if z.restricted %}<span class="text-xs bg-rose-100 text-rose-700 px-2 py-0.5 rounded-full">restricted</span>{% endif %}</p>
+      <p class="text-sm text-slate-500">{{ z.description }}</p>
+    </div>
+    <a href="{% url 'access:zone_edit' z.pk %}" class="text-sky-700 underline text-sm">Edit</a>
+  </div>
+  {% empty %}<p class="p-6 text-center text-slate-400">No zones defined.</p>{% endfor %}
+</div>
+{% endblock %}

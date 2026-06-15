@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}{{ visit.reference }}{% endblock %}
+{% block content %}
+<div class="max-w-2xl mx-auto space-y-4">
+  <div class="bg-white rounded-xl shadow p-6">
+    <div class="flex items-center justify-between">
+      <h1 class="text-xl font-bold">{{ visit.reference }}</h1>
+      <span class="px-3 py-1 rounded-full text-sm font-semibold bg-slate-100">{{ visit.get_status_display }}</span>
+    </div>
+    <dl class="grid grid-cols-2 gap-3 mt-4 text-sm">
+      <div><dt class="text-slate-500">Visitor</dt><dd class="font-medium">{{ visit.display_name }}</dd></div>
+      <div><dt class="text-slate-500">Host</dt><dd class="font-medium">{{ visit.host.get_full_name|default:visit.host.username }}</dd></div>
+      <div><dt class="text-slate-500">From</dt><dd>{{ visit.expected_start|date:"d M Y H:i" }}</dd></div>
+      <div><dt class="text-slate-500">To</dt><dd>{{ visit.expected_end|date:"d M Y H:i" }}</dd></div>
+      <div class="col-span-2"><dt class="text-slate-500">Purpose</dt><dd>{{ visit.purpose }}</dd></div>
+      {% if visit.vehicle_reg %}<div><dt class="text-slate-500">Vehicle</dt><dd>{{ visit.vehicle_reg }}</dd></div>{% endif %}
+    </dl>
+    {% if visit.party.exists %}
+      <h2 class="font-semibold mt-4 text-sm">Party members</h2>
+      <ul class="list-disc ml-5 text-sm">{% for p in visit.party.all %}<li>{{ p.full_name }}</li>{% endfor %}</ul>
+    {% endif %}
+  </div>
+
+  {% if access_pass and visit.status == 'APPROVED' or visit.status == 'CHECKED_IN' %}
+  <div class="bg-white rounded-xl shadow p-6 text-center">
+    <h2 class="font-bold mb-2">Your access pass</h2>
+    {% if qr_uri %}
+      <img src="{{ qr_uri }}" alt="Access pass QR code" class="mx-auto w-56 h-56">
+    {% elif access_pass %}
+      <p class="text-xs text-slate-500 mb-1">Present this code at the gate:</p>
+      <code class="block break-all bg-slate-50 p-3 rounded text-xs">{{ access_pass.token }}</code>
+    {% endif %}
+    <p class="text-sm text-slate-500 mt-3">
+      Valid {{ access_pass.valid_from|date:"d M H:i" }} – {{ access_pass.valid_until|date:"d M H:i" }}
+      {% if access_pass.single_entry %}· single entry{% endif %}
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Verify pass{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto space-y-4">
+  <div class="bg-white rounded-xl shadow p-6">
+    <h1 class="text-xl font-bold mb-3">Verify a pass</h1>
+    <p class="text-sm text-slate-500 mb-3">Scan the visitor's QR code into the box (a USB scanner types it like a keyboard) or enter their VR- reference.</p>
+    <form method="post" class="space-y-3">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button class="bg-slate-900 text-white px-4 py-2 rounded-lg font-semibold w-full">Verify</button>
+    </form>
+  </div>
+
+  {% if result %}
+  <div class="rounded-xl shadow p-6 {% if result.allowed %}bg-emerald-50 border border-emerald-300{% else %}bg-rose-50 border border-rose-300{% endif %}">
+    <h2 class="text-lg font-bold {% if result.allowed %}text-emerald-700{% else %}text-rose-700{% endif %}">
+      {% if result.allowed %}✔ ALLOWED{% else %}✖ DENIED{% endif %}
+    </h2>
+    <p class="text-sm mt-1">{{ result.reason }}</p>
+    {% if result.access_pass %}
+      {% with v=result.access_pass.visit %}
+      <dl class="grid grid-cols-2 gap-2 mt-3 text-sm">
+        <div><dt class="text-slate-500">Visitor</dt><dd class="font-medium">{{ v.display_name }}</dd></div>
+        <div><dt class="text-slate-500">ID</dt><dd>{{ v.id_type }} {{ v.id_number }}</dd></div>
+        <div><dt class="text-slate-500">Host</dt><dd>{{ v.host.get_full_name|default:v.host.username }}</dd></div>
+        <div><dt class="text-slate-500">Window</dt><dd>{{ v.expected_start|date:"H:i" }}–{{ v.expected_end|date:"H:i" }}</dd></div>
+        {% if result.access_pass.zones.exists %}
+        <div class="col-span-2"><dt class="text-slate-500">Zones</dt>
+          <dd>{% for z in result.access_pass.zones.all %}{{ z.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</dd></div>
+        {% endif %}
+      </dl>
+      {% if result.allowed %}
+      <form method="post" action="{% url 'visits:pass_action' result.access_pass.pk 'in' %}" class="mt-4">
+        {% csrf_token %}
+        <input type="hidden" name="gate" value="{{ gate }}">
+        <button class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold w-full">Check in</button>
+      </form>
+      {% elif v.status == 'CHECKED_IN' %}
+      <form method="post" action="{% url 'visits:pass_action' result.access_pass.pk 'out' %}" class="mt-4">
+        {% csrf_token %}
+        <input type="hidden" name="gate" value="{{ gate }}">
+        <button class="bg-slate-700 text-white px-4 py-2 rounded-lg font-semibold w-full">Check out</button>
+      </form>
+      {% endif %}
+      {% endwith %}
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

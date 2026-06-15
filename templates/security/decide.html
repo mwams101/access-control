@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Review {{ visit.reference }}{% endblock %}
+{% block content %}
+<div class="max-w-xl mx-auto bg-white rounded-xl shadow p-6">
+  <h1 class="text-xl font-bold mb-3">Review {{ visit.reference }}</h1>
+  <dl class="grid grid-cols-2 gap-2 text-sm mb-4">
+    <div><dt class="text-slate-500">Visitor</dt><dd class="font-medium">{{ visit.display_name }}</dd></div>
+    <div><dt class="text-slate-500">ID</dt><dd>{{ visit.id_type }} {{ visit.id_number }}</dd></div>
+    <div><dt class="text-slate-500">Host</dt><dd>{{ visit.host.get_full_name|default:visit.host.username }}</dd></div>
+    <div><dt class="text-slate-500">When</dt><dd>{{ visit.expected_start|date:"d M H:i" }}–{{ visit.expected_end|date:"H:i" }}</dd></div>
+    <div class="col-span-2"><dt class="text-slate-500">Purpose</dt><dd>{{ visit.purpose }}</dd></div>
+  </dl>
+  <form method="post" class="space-y-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div class="flex gap-3">
+      <button name="decision" value="approve" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-semibold flex-1">Approve & issue pass</button>
+      <button name="decision" value="deny" class="bg-rose-600 text-white px-4 py-2 rounded-lg font-semibold flex-1">Deny</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Visits report{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+  <h1 class="text-2xl font-bold">Visits report</h1>
+  <a href="?{{ request.GET.urlencode }}&format=csv" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold">Export CSV</a>
+</div>
+<form method="get" class="bg-white rounded-xl shadow p-4 mb-4 flex flex-wrap gap-3 items-end text-sm">
+  <label>From <input type="date" name="from" value="{{ request.GET.from }}" class="border rounded px-2 py-1 block"></label>
+  <label>To <input type="date" name="to" value="{{ request.GET.to }}" class="border rounded px-2 py-1 block"></label>
+  <label>Status
+    <select name="status" class="border rounded px-2 py-1 block">
+      <option value="">All</option>
+      <option value="PENDING" {% if request.GET.status == 'PENDING' %}selected{% endif %}>Pending</option>
+      <option value="APPROVED" {% if request.GET.status == 'APPROVED' %}selected{% endif %}>Approved</option>
+      <option value="DENIED" {% if request.GET.status == 'DENIED' %}selected{% endif %}>Denied</option>
+      <option value="CHECKED_IN" {% if request.GET.status == 'CHECKED_IN' %}selected{% endif %}>Checked in</option>
+      <option value="CHECKED_OUT" {% if request.GET.status == 'CHECKED_OUT' %}selected{% endif %}>Checked out</option>
+      <option value="EXPIRED" {% if request.GET.status == 'EXPIRED' %}selected{% endif %}>Expired</option>
+    </select>
+  </label>
+  <button class="bg-slate-900 text-white px-4 py-2 rounded-lg font-semibold">Filter</button>
+</form>
+<div class="bg-white rounded-xl shadow overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead class="bg-slate-50 text-left text-slate-500">
+      <tr><th class="p-3">Reference</th><th class="p-3">Visitor</th><th class="p-3">Host</th><th class="p-3">Status</th><th class="p-3">When</th></tr>
+    </thead>
+    <tbody>
+      {% for v in visits %}
+      <tr class="border-t">
+        <td class="p-3 font-mono">{{ v.reference }}</td>
+        <td class="p-3">{{ v.display_name }}</td>
+        <td class="p-3">{{ v.host.get_full_name|default:v.host.username }}</td>
+        <td class="p-3">{{ v.get_status_display }}</td>
+        <td class="p-3">{{ v.expected_start|date:"d M Y H:i" }}</td>
+      </tr>
+      {% empty %}<tr><td colspan="5" class="p-6 text-center text-slate-400">No visits match the filters.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

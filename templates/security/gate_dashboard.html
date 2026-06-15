@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Gate dashboard{% endblock %}
+{% block content %}
+<div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+  <h1 class="text-2xl font-bold">Gate dashboard</h1>
+  <div class="flex gap-2">
+    <a href="{% url 'visits:verify' %}" class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-semibold">Scan / verify pass</a>
+    <a href="{% url 'visits:walkin' %}" class="bg-amber-500 text-white px-4 py-2 rounded-lg text-sm font-semibold">Register walk-in</a>
+  </div>
+</div>
+
+<div class="grid md:grid-cols-3 gap-4">
+  <div class="bg-white rounded-xl shadow p-4">
+    <h2 class="font-bold mb-2">Pending approvals <span class="text-slate-400 text-sm">({{ pending|length }})</span></h2>
+    {% for v in pending %}
+      <a href="{% url 'visits:decide' v.pk %}" class="block border-t py-2 text-sm hover:bg-slate-50">
+        <span class="font-mono text-xs">{{ v.reference }}</span> — {{ v.display_name }}
+        <span class="text-slate-400 block text-xs">→ {{ v.host.get_full_name|default:v.host.username }}, {{ v.expected_start|date:"d M H:i" }}</span>
+      </a>
+    {% empty %}<p class="text-sm text-slate-400">Nothing pending.</p>{% endfor %}
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-4">
+    <h2 class="font-bold mb-2">Expected today <span class="text-slate-400 text-sm">({{ expected_today|length }})</span></h2>
+    {% for v in expected_today %}
+      <div class="border-t py-2 text-sm">
+        {{ v.display_name }} <span class="text-slate-400 text-xs">{{ v.expected_start|date:"H:i" }} · {{ v.host.get_full_name|default:v.host.username }}</span>
+      </div>
+    {% empty %}<p class="text-sm text-slate-400">No approved visits expected today.</p>{% endfor %}
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-4">
+    <h2 class="font-bold mb-2">Currently inside <span class="text-slate-400 text-sm">({{ inside|length }})</span></h2>
+    {% for v in inside %}
+      <div class="border-t py-2 text-sm {% if v.is_overdue %}text-rose-600{% endif %}">
+        {{ v.display_name }}{% if v.is_overdue %} ⚠ overdue{% endif %}
+        <span class="text-slate-400 block text-xs">until {{ v.expected_end|date:"H:i" }}</span>
+      </div>
+    {% empty %}<p class="text-sm text-slate-400">Building is empty of visitors.</p>{% endfor %}
+    <a href="{% url 'visits:occupancy' %}" class="text-sky-700 underline text-sm block mt-2">Full list →</a>
+  </div>
+</div>
+{% endblock %}

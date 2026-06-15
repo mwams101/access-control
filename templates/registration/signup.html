@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Visitor sign-up{% endblock %}
+{% block content %}
+<div class="max-w-md mx-auto bg-white rounded-xl shadow p-6 mt-6">
+  <h1 class="text-xl font-bold mb-4">Create a visitor account</h1>
+  <form method="post" class="space-y-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="w-full bg-slate-900 text-white rounded-lg py-2 font-semibold">Sign up</button>
+  </form>
+</div>
+{% endblock %}

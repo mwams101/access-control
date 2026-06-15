@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Access Control{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800">
+  <nav class="bg-slate-900 text-white">
+    <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-2">
+      <a href="/" class="font-bold tracking-wide">🛂 Access Control</a>
+      <div class="flex items-center gap-4 text-sm">
+        {% if user.is_authenticated %}
+          {% if user.is_admin_role %}
+            <a href="{% url 'reports:dashboard' %}" class="hover:text-amber-300">Dashboard</a>
+            <a href="{% url 'reports:visits_report' %}" class="hover:text-amber-300">Reports</a>
+            <a href="{% url 'reports:audit' %}" class="hover:text-amber-300">Audit</a>
+            <a href="{% url 'access:zones' %}" class="hover:text-amber-300">Zones</a>
+            <a href="{% url 'access:blacklist' %}" class="hover:text-amber-300">Blacklist</a>
+          {% endif %}
+          {% if user.is_staff_role %}
+            <a href="{% url 'visits:gate_dashboard' %}" class="hover:text-amber-300">Gate</a>
+            <a href="{% url 'visits:pending' %}" class="hover:text-amber-300">Approvals</a>
+            <a href="{% url 'visits:occupancy' %}" class="hover:text-amber-300">Inside</a>
+          {% else %}
+            <a href="{% url 'visits:my_visits' %}" class="hover:text-amber-300">My visits</a>
+            <a href="{% url 'visits:visit_create' %}" class="hover:text-amber-300">New request</a>
+          {% endif %}
+          <form method="post" action="{% url 'accounts:logout' %}" class="inline">
+            {% csrf_token %}
+            <button class="text-slate-300 hover:text-white">Logout ({{ user.username }})</button>
+          </form>
+        {% else %}
+          <a href="{% url 'accounts:login' %}" class="hover:text-amber-300">Login</a>
+          <a href="{% url 'accounts:signup' %}" class="hover:text-amber-300">Visitor sign-up</a>
+        {% endif %}
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="mb-4 px-4 py-3 rounded-lg text-sm
+          {% if message.tags == 'success' %}bg-emerald-100 text-emerald-800
+          {% elif message.tags == 'error' %}bg-rose-100 text-rose-800
+          {% elif message.tags == 'warning' %}bg-amber-100 text-amber-800
+          {% else %}bg-sky-100 text-sky-800{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>
