@@ -11,10 +11,11 @@ class VisitorSignUpForm(UserCreationForm):
     last_name = forms.CharField(max_length=150)
     email = forms.EmailField()
     phone = forms.CharField(max_length=20, required=False)
+    image = forms.ImageField(required=True, label="Profile photo")
 
     class Meta:
         model = User
-        fields = ("username", "first_name", "last_name", "email", "phone")
+        fields = ("username", "first_name", "last_name", "email", "phone", "image")
 
     def save(self, commit=True):
         user = super().save(commit=False)

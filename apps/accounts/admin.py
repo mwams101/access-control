@@ -9,8 +9,8 @@ class UserAdmin(DjangoUserAdmin):
     list_display = ("username", "first_name", "last_name", "email", "role", "is_active")
     list_filter = ("role", "is_active")
     fieldsets = DjangoUserAdmin.fieldsets + (
-        ("Access control", {"fields": ("role", "phone")}),
+        ("Access control", {"fields": ("role", "phone", "image")}),
     )
     add_fieldsets = DjangoUserAdmin.add_fieldsets + (
-        ("Access control", {"fields": ("role", "phone", "email", "first_name", "last_name")}),
+        ("Access control", {"fields": ("role", "phone", "image", "email", "first_name", "last_name")}),
     )

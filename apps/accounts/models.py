@@ -12,6 +12,11 @@ class User(AbstractUser):
 
     role = models.CharField(max_length=10, choices=Role.choices, default=Role.VISITOR)
     phone = models.CharField(max_length=20, blank=True)
+    # Required profile photo. blank=False makes it mandatory in every ModelForm
+    # (visitor sign-up, admin user-add). At the DB level a FileField stores an
+    # empty string rather than NULL, so CLI-created users (createsuperuser,
+    # create_user) won't crash — see README for enforcing it for them too.
+    image = models.ImageField(upload_to="user_photos/", blank=False)
 
     @property
     def is_admin_role(self) -> bool:

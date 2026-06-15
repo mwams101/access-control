@@ -38,6 +38,15 @@ User.objects.create_user('guard', password='guard12345', role='SECURITY', first_
 
 Visitors self-register at `/accounts/signup/`.
 
+> **Profile photo (required).** `User.image` is mandatory in every form — the
+> visitor sign-up form and the admin user-add screen both reject submission
+> without an uploaded photo. Because Django's `ImageField` stores an empty
+> string (not NULL) at the database level, accounts created from the command
+> line (`createsuperuser`, `create_user` above) are *not* forced to have a
+> photo and will save with an empty `image`. If you need the photo enforced for
+> those too, either set it afterwards in `/django-admin/`, or add a default
+> avatar / a custom manager check. The QR/check-in flows don't depend on it.
+
 ## Walking through the main flows
 
 1. **Visitor** signs up, then submits a request at `/visits/new/` (host, purpose, time window; optional entity/group with party members and vehicle reg).
